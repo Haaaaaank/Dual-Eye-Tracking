@@ -1,5 +1,9 @@
+'''
+Server controls the experimental process
+'''
 import os
-from socket import *
+import socket
+import threading
 from openexp.keyboard import keyboard
 
 #setting experiment variables
@@ -13,13 +17,14 @@ self.experiment.set('response', key)
 
 
 # Sending a trigger
-
-host = "35.2.15.136" # set to IP address of target computer
-port = 13000
-addr = (host, port)
-UDPSock = socket(AF_INET, SOCK_DGRAM)
+HOST = "35.2.2.134" # set to IP address of target computer
+PORT = 13000
+addr = (HOST, PORT)
+TCPSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 while True:
 	if self.experiment.get('response') == 'space':
 		data = "1"
-		UDPSock.sendto(data, addr)
+		TCPSock.send(data)
 		break
+
+
