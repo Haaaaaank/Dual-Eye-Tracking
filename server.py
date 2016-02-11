@@ -31,6 +31,7 @@ class Server:
 
     def send(self):
         # TODO should send data from all clients to all the other clients
+        # TODO Use try catch; remove from connections if error
         while True:
             self.sock.sendall(utilities.pack_data())
 
@@ -42,9 +43,17 @@ class Server:
                     self.handle_data(addr, data)
                 else:
                     logging.error("Client " + addr + " disconnected")
+            except RuntimeError:
+                client.close()
+                logging.error("Socket connection to " + addr + " broken.")
+                # TODO remove from connections
+                # TODO should try reconnecting?
             except:
                 client.close()
                 logging.error("Unexpected exception. Connection to " + addr + " closed.")
+                # TODO remove from connections
+                # TODO should try reconnecting?
+
 
     def handle_data(self, addr, data):
         print addr, data

@@ -42,19 +42,19 @@ def recv_data(sock):
     """
     raw_length = recvall(sock, constants.INTEGER_STANDARD_LENGTH)  # get the length of data
     if not raw_length:
-        return None
+        raise RuntimeError("Socket connection broken.")
     length = struct.unpack('>I', raw_length)[0]  # convert the length to an integer
     return recvall(sock, length)  # Read the data
 
 
 def recvall(sock, length):
     """
-    A helper function that receives data of 'size' length or returns None if EOF is hit
+    A helper function that receives data of 'size' length or raise error if EOF is hit
     """
     data = ""
     while len(data) < length:
         packet = sock.recv(length - len(data))
         if not packet:
-            return None
+            raise RuntimeError("Socket connection broken.")
         data += packet
     return data
