@@ -3,7 +3,6 @@ Server controls the experimental process
 '''
 import os
 import socket
-import threading
 from openexp.keyboard import keyboard
 
 #setting experiment variables

@@ -1,7 +1,7 @@
 import os
 import socket
 
-#showing the waiting message
+# showing the waiting message
 my_canvas = canvas()
 my_canvas.text('<b>Waiting for the main computer...</b>')
 my_canvas.show()

@@ -1,5 +1,5 @@
 """
-A client is a thread, 
+A client
 """
 import socket
 import logging
@@ -8,14 +8,14 @@ import utilities
 
 
 class Client:
-    def __init__(self, hostname):
+    def __init__(self, hostname, port):
         logging.basicConfig(filename='clientLog.log', level=logging.DEBUG)
 
         self.host = hostname
-        self.port = 13000    # TODO input as parameter?
+        self.port = port
         self.sock = None
 
     def send(self):
         while True:
-            self.sock.send(utilities.get_data())
+            self.sock.send(utilities.pack_data())
 

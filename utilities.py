@@ -4,17 +4,17 @@ import logging
 import struct
 import constants
 
-counter = 0
+counter = 0  # TODO this is just for test purpose
 
 
 def open_socket(sock, host, port):
     """
-    Construct the socket and start listening
+    Construct the socket and start listening, or terminate the program on error
     """
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.bind((host, port))
-        sock.listen(constants.BACKLOG)
+        sock.listen(constants.SOCKET_BACKLOG)  # start listening
     except socket.error, (value, message):
         if sock:
             sock.close()
@@ -30,9 +30,9 @@ def pack_data():
     """
     global counter
     counter += 1
-    data = "test data " + str(counter)
+    data = "test data " + str(counter)  # TODO will get data from the eye tracker
 
-    data = struct.pack('>I', len(data)) + data
+    data = struct.pack('>I', len(data)) + data  # prefix with length
     return data
 
 
@@ -40,21 +40,20 @@ def recv_data(sock):
     """
     Read message length and unpack it into an integer
     """
-    raw_size = recvall(sock, 4)
-    if not raw_size:
+    raw_length = recvall(sock, constants.INTEGER_STANDARD_LENGTH)  # get the length of data
+    if not raw_length:
         return None
-    size = struct.unpack('>I', raw_size)[0]
-    # Read the data
-    return recvall(sock, size)
+    length = struct.unpack('>I', raw_length)[0]  # convert the length to an integer
+    return recvall(sock, length)  # Read the data
 
 
-def recvall(sock, size):
+def recvall(sock, length):
     """
     A helper function that receives data of 'size' length or returns None if EOF is hit
     """
-    data = ''
-    while len(data) < size:
-        packet = sock.recv(size - len(data))
+    data = ""
+    while len(data) < length:
+        packet = sock.recv(length - len(data))
         if not packet:
             return None
         data += packet
