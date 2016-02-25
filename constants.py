@@ -1,3 +1,8 @@
+import socket
+
 INTEGER_STANDARD_LENGTH = 4
 SOCKET_BACKLOG = 5
 CONNECTION_TIMEOUT = 60
+
+LOCAL_HOST = socket.gethostname()
+PORT = 13000

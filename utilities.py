@@ -7,7 +7,7 @@ import constants
 counter = 0  # TODO this is just for test purpose
 
 
-def open_socket(sock, host, port):
+def open_socket(host, port):
     """
     Construct the socket and start listening, or terminate the program on error
     """
@@ -22,6 +22,7 @@ def open_socket(sock, host, port):
         sys.exit(1)
 
     logging.info("Socket opened. Waiting for a connection.")
+    return sock
 
 
 def pack_data():
@@ -52,7 +53,7 @@ def recvall(sock, length):
     A helper function that receives data of 'size' length or raise error if EOF is hit
     """
     data = ""
-    while len(data) < length:
+    while len(data) <= length:
         packet = sock.recv(length - len(data))
         if not packet:
             raise RuntimeError("Socket connection broken.")
