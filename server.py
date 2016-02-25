@@ -23,10 +23,8 @@ class Server:
         self.container_lock = threading.Lock()
 
     def run(self):
+        logging.info("Server started.")
         self.sock = utilities.open_socket(self.host, self.port)
-        self.sending = True
-        self.sending_thread = threading.Thread(target=self.send, args=())
-        self.sending_thread.start()
         self.connect()
 
     def connect(self):
@@ -34,24 +32,35 @@ class Server:
         #     utilities.open_socket(self.sock, self.host, self.port)
 
         while True:  # TODO while len(self.connections) < num_clients ?
+            logging.info("before accept().")
             conn, addr = self.sock.accept()
+            logging.info("after accept().") # DOESN'T SHOW!!!
             conn.settimeout(constants.CONNECTION_TIMEOUT)
             self.container_lock.acquire()
             self.clients += [(conn, addr)]
             self.container_lock.release()
             logging.info("Connected to " + addr + ".")
+
+            # send
+            self.sending = True
+            self.sending_thread = threading.Thread(target=self.send, args=(conn, addr))
+            self.sending_thread.start()
+
+            # receive
             self.receiving = True
             self.receiving_thread = threading.Thread(target=self.receive, args=(conn, addr))
             self.receiving_thread.start()
 
-    def send(self):
+    def send(self, client, addr):
         # TODO should send data from all clients to all the other clients
         # TODO Use try catch; remove from connections if error
         # Assuming there's only one server and one client right now
-        while True:
-            self.sock.sendall(utilities.pack_data())
+        logging.info("Start sending data.")
+        while self.sending:
+            client.sendall(utilities.pack_data())
 
     def receive(self, client, addr):
+        logging.info("Start receiving data.")
         while self.receiving:
             try:
                 data = utilities.recv_data(client)

@@ -20,35 +20,45 @@ class Client:
         self.receiving = False
 
     def run(self):
+        logging.info("Client started.")
         self.sock = utilities.open_socket(self.host, self.port)
-        self.sending = True
-        self.sending_thread = threading.Thread(target=self.send, args=())
-        self.sending_thread.start()
-        self.receiving = True
-        self.receiving_thread = threading.Thread(target=self.receive, args=())
-        self.receiving_thread.start()
+        self.connect()
 
-    def send(self):
-        while self.sending:
-            self.sock.send(utilities.pack_data())
-
-    def receive(self):
+    def connect(self):
         conn, addr = self.sock.accept()
         conn.settimeout(constants.CONNECTION_TIMEOUT)
         logging.info("Connected to " + addr + ".")
+
+        # send
+        self.sending = True
+        self.sending_thread = threading.Thread(target=self.send, args=(conn, addr))
+        self.sending_thread.start()
+
+        # receive
+        self.receiving = True
+        self.receiving_thread = threading.Thread(target=self.receive, args=(conn, addr))
+        self.receiving_thread.start()
+
+
+    def send(self, client, addr):
+        logging.info("Start sending data.")
+        while self.sending:
+            client.sendall(utilities.pack_data())
+
+    def receive(self, client, addr):
         while self.receiving:
             try:
-                data = utilities.recv_data(conn)
+                data = utilities.recv_data(client)
                 if data:
                     self.handle_data(addr, data)
                 else:
                     logging.error("Client " + addr + " disconnected")
             except:
-                conn.close()
+                client.close()
                 logging.error("Unexpected exception. Client connection to " + addr + " closed.")
                 # TODO remove from connections
                 # TODO should try reconnecting?
-        conn.close()
+        client.close()
 
     def exit(self):
         self.receiving = False
@@ -62,5 +72,5 @@ class Client:
 
 
 if __name__ == "__main__":
-    client = Client(constants.PORT, constants.LOCAL_HOST)
+    client = Client(constants.PORT, "")
     client.run()

@@ -4,5 +4,5 @@ INTEGER_STANDARD_LENGTH = 4
 SOCKET_BACKLOG = 5
 CONNECTION_TIMEOUT = 60
 
-LOCAL_HOST = socket.gethostname()
+LOCAL_HOST = "67.194.12.143" # "35.2.11.247" # socket.gethostname()
 PORT = 13000
