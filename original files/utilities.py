@@ -13,6 +13,7 @@ def open_socket(host, port):
     """
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock.bind((host, port))
         sock.listen(constants.SOCKET_BACKLOG)  # start listening
     except socket.error, (value, message):
