@@ -1,24 +1,18 @@
 #!/bin/env python
 """
-  File: chatserver.py
-
-  Chat Server with Threading
+    The server
 """
-# Copyright 2009 Tim Bower 
-# This program was developed for education purposes for the Network
-# Programming Class, CMST 355, at Kansas State University at Salina.
-#
-# This program is licensed as Open Source Software using the Apache License,
-# Version 2.0 (the "License"); you may not use this file except in compliance
-# with the License. You may obtain a copy of the License at
-#
-#    http://www.apache.org/licenses/LICENSE-2.0
-#
-# You are free to use, copy, distribute, and display the work, and to make
-# derivative works. If you do, you must give the original author credit. The
-# author specifically permits (and encourages) teachers to post, reproduce,
-# and distribute some or all of this material for use in their classes or by
-# their students.
+"""
+    Copyright 2016 Meng Du
+
+    Adopted from Tim Bower's Multi-threaded Chat Server
+    Original work Copyright 2009 Tim Bower
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+        http://www.apache.org/licenses/LICENSE-2.0
+"""
 
 import socket
 import threading
@@ -210,9 +204,9 @@ def handle_child(clientsock):
 
         # Process the message received from the client
         # First check if it is a one of the special chat protocol messages.
-        if data.startswith('/nick'):
+        if data.startswith('/name'):
             oldpeer = peer
-            peer = data.replace('/nick', '', 1).strip()
+            peer = data.replace('/name', '', 1).strip()
             if len(peer):
                 chatQueue.writer("%s now goes by %s\r\n" % (str(oldpeer), str(peer)))
             else:
