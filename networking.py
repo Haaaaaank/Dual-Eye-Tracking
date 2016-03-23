@@ -15,16 +15,12 @@
 
 import socket
 import threading
-
-defaulthost = 'localhost'
-port = 50000
+import constants
 
 
 class Connection(threading.Thread):
-    """
-    Run as a separate thread to make and manage the socket connection to the
-    chat server.
-    """
+    # A separate thread class to make and manage the socket connection to the server.
+
     def __init__(self, host, connected, display, lost):
         print "networking.py/Connection.__init__"
         threading.Thread.__init__(self)
@@ -38,12 +34,12 @@ class Connection(threading.Thread):
         self.msg = []
 
     def run(self):
+        # The new thread starts here to listen for data from the server
         print "networking.py/Connection.run"
-        "The new thread starts here to listen for data from the server"
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.settimeout(1)
         try:
-            self.socket.connect((self.host, port))
+            self.socket.connect((self.host, constants.PORT))
         except:
             self.lost("Unable to connect to %s. Please check the server." % self.host)
             return
@@ -51,18 +47,18 @@ class Connection(threading.Thread):
         while True:
             self.__send()
             try:
-                data = self.socket.recv(4096)
+                data = self.socket.recv(constants.BUFFER_SIZE)
             # Timeout once in a while just to check user input
             except socket.timeout:
                 continue
             except:  # server was stopped or had some error
-                self.lost("Network Connection closed by the server...")
+                self.lost("Network Connection closed by the server.")
                 break
             if len(data):
                 self.display(data)
             else:
                 # no data when peer does a socket.close()
-                self.lost("Network Connection closed...")
+                self.lost("Network Connection closed.")
                 break
         # End loop of network send / recv data
         self.socket.close()

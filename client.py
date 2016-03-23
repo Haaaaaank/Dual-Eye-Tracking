@@ -1,7 +1,8 @@
 #!/bin/env python
 
 """
-    The client application to go along with the chat server.
+    A client represents a user with an eye tracker. It sends its eye tracking data
+    to the server, and receives data of all the other clients from the server.
 """
 """
     Copyright 2016 Meng Du
@@ -15,8 +16,8 @@
 import sys
 import time
 import random
-
-from networking import Connection, defaulthost
+import constants
+from networking import Connection
 
 
 class Client(object):
@@ -44,7 +45,7 @@ class Client(object):
         # Connect to server
         print "client.py/Client.connect"
         # A thread to listen to the network and display messages from server
-        self.network = Connection(host, self.connected, self.display, self.lost_connection)
+        self.network = Connection(constants.host, self.connected, self.display, self.lost_connection)
         self.network.start()
 
     def disconnect(self):
@@ -103,7 +104,7 @@ class Client(object):
         print "client.py/Client.lostConnection"
         self.network.join()
 
-    def quit(self, event):
+    def quit(self):
         # Quit connection
         print "client.py/Client.quit"
         if self.isConnected:
@@ -116,11 +117,11 @@ if __name__ == "__main__":
     print "client.py/__main__"
     # set host name from command line arguments, if any
     if len(sys.argv) > 1:
-        host = sys.argv[1]
+        constants.host = sys.argv[1]
     else:
-        host = defaulthost
+        constants.host = constants.DEFAULT_HOST
     chat = Client()
     chat.connect()
     while True:
         chat.send()
-        time.sleep(2)
+        time.sleep(3)
