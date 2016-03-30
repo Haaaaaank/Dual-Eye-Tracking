@@ -37,7 +37,7 @@ class Connection(threading.Thread):
         # The new thread starts here to listen for data from the server
         print "networking.py/Connection.run"
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.settimeout(1)
+        self.socket.settimeout(constants.SOCKET_TIMEOUT)
         try:
             self.socket.connect((self.host, constants.PORT))
         except:

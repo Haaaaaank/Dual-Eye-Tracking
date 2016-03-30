@@ -16,6 +16,7 @@
 import sys
 import time
 import random
+import datetime
 import constants
 from networking import Connection
 
@@ -97,6 +98,7 @@ class Client(object):
         print "client.py/Client.display"
         # Message to display from the chat server.
         # Invoked via :func:`wx.CallAfter` in :mod:`rendezvous`.
+        print datetime.datetime.now()
         print msg
 
     def lost_connection(self, msg):  # TODO
@@ -122,6 +124,5 @@ if __name__ == "__main__":
         constants.host = constants.DEFAULT_HOST
     chat = Client()
     chat.connect()
-    while True:
-        chat.send()
-        time.sleep(3)
+    # while True:
+    #     chat.send()

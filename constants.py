@@ -4,3 +4,4 @@ DEFAULT_HOST = 'localhost'
 host = ''   # global
 PORT = 50000
 SOCKET_BACKLOG = 5
+SOCKET_TIMEOUT = 1
