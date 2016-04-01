@@ -24,7 +24,6 @@ import logging
 import constants
 
 MAX_CYCLIC_INDEX = 100
-MAX_MSG_QUEUE_LENTH = 10
 
 
 def get_msg_index(old, last, new):
@@ -71,6 +70,7 @@ class MSGQueue(object):
         self.writerCounterLock = threading.Lock()
         self.readPending = threading.Lock()
         self.writeLock = threading.Lock()
+        self.writeLock = threading.Lock()
         self.readLock = threading.Lock()
 
 # The messages are kept in a
@@ -116,8 +116,6 @@ class MSGQueue(object):
         # here is the critical section
         self.current = self.cyclic_count.next()
         self.msg.append((self.current, time.localtime(), data))
-        while len(self.msg) > MAX_MSG_QUEUE_LENTH:
-            del self.msg[0]     # remove oldest item
         # End of critical section
         self.writeLock.release()
         self.writerCounterLock.acquire()
@@ -127,8 +125,8 @@ class MSGQueue(object):
         self.writerCounterLock.release()
 
 
-def send_all(sock, last_read):
-    print "server.py/MSGQueue.send_all"
+def send_to_client(sock, last_read):
+    print "server.py/MSGQueue.send_to_client"
     # this function just cuts down on some code duplication
     global dataQueue
     reading = dataQueue.reader(last_read)
@@ -165,7 +163,7 @@ def handle_child(client_sock):
     dataQueue.writer(msg)
     while True:
         # check for and send any new messages
-        last_read = send_all(client_sock, last_read)
+        last_read = send_to_client(client_sock, last_read)
         try:
             data = client_sock.recv(constants.BUFFER_SIZE)
         except socket.timeout:
@@ -182,8 +180,8 @@ def handle_child(client_sock):
             client_exit(client_sock, str(peer))
             break
 
-        # Process the message received from the client
-        # First check if it is a one of the special chat protocol messages.
+        # Process the data received from the client
+        # Check if it is a command
         if data.startswith('/name'):
             old_peer = peer
             peer = data.replace('/name', '', 1).strip()
@@ -201,8 +199,7 @@ def handle_child(client_sock):
             dataQueue.writer(msg)
             break            # exit the loop to disconnect
 
-        else:
-            # Not a special command, but a chat message
+        else:  # received data
             dataQueue.writer("Message from %s:\r\n\t%s\r\n" % (str(peer), data))
 
     client_sock.close()  # close the connection
@@ -210,6 +207,13 @@ def handle_child(client_sock):
 
 if __name__ == '__main__':
     print "server.py/__main__"
+
+    # TODO
+    import sys
+    old_stdout = sys.stdout
+    # sys.stdout = open("serverout.txt", "w")
+    # - TODO -
+
     dataQueue = MSGQueue()  # a global data queue
     clients = []
 
@@ -242,3 +246,5 @@ if __name__ == '__main__':
         new_thread = threading.Thread(target=handle_child, args=[client_sock])
         new_thread.setDaemon(True)
         new_thread.start()
+
+    sys.stdout = old_stdout

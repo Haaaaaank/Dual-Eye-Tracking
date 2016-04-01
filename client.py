@@ -18,7 +18,7 @@ import time
 import random
 import datetime
 import constants
-from networking import Connection
+from connection import Connection
 
 
 class Client(object):
@@ -28,7 +28,7 @@ class Client(object):
     def __init__(self):
         print "client.py/Client.__init__"
         self.isConnected = False
-        self.network = None
+        self.connection = None
         self.tempCounter = 0
         self.tempName = random.randint(1, 100)
 
@@ -45,14 +45,14 @@ class Client(object):
     def connect(self):
         # Connect to server
         print "client.py/Client.connect"
-        # A thread to listen to the network and display messages from server
-        self.network = Connection(constants.host, self.connected, self.display, self.lost_connection)
-        self.network.start()
+        # Start another thread for the connection
+        self.connection = Connection(constants.host, self.connected, self.display, self.lost_connection)
+        self.connection.start()
 
     def disconnect(self):
         # Disconnect from server
-        name = self.get_data()
-        self.network.send("/quit " + name)
+        name = self.get_data()  # TODO whut
+        self.connection.send_to_server("/quit " + name)
 
     def send(self):
         # Send the data to server. Data is obtained by get_data().
@@ -61,58 +61,39 @@ class Client(object):
             sendData = self.get_data()
             print "client_send: ", sendData
             if len(sendData):
-                self.network.send(sendData)
+                self.connection.send_to_server(sendData)
 
     def set_name(self):
         print "client.py/Client.set_name"
-        """
-            Set an alternative name
-            TODO: name does not come from get_data(), but?
-        """
+        # Set an alternative name
         if self.isConnected:
-            name = self.get_data()
+            name = self.get_data()  # TODO change this, name does not come from get_data()
             if len(name):
-                self.network.send("/name " + name)
-
-    """
-    def brb(self, event):
-        print "client.py/Client.brb"
-        "*Be Right Back* and *I'm Back* button call back"
-        msg = self.get_data()
-        if self.here:
-            # switch from here to away
-            self.here = False
-            self.net.send("/brb " + msg)
-        else:
-            # switch from away to here
-            self.here = True
-            self.net.send("/back " + msg)
-    """
+                self.connection.send_to_server("/name " + name)
 
     def connected(self):
         # This function is invoked in networking.Connection.run()
         print "client.py/Client.connected"
         self.isConnected = True
 
-    def display(self, msg):  # TODO DISPLAY EYE POSITION
+    def display(self, data):  # TODO DISPLAY EYE POSITION
         print "client.py/Client.display"
-        # Message to display from the chat server.
-        # Invoked via :func:`wx.CallAfter` in :mod:`rendezvous`.
+        # Display the eye positions
         print datetime.datetime.now()
-        print msg
+        print data
 
     def lost_connection(self, msg):  # TODO
         # This function is invoked in networking.Connection.run() when connection is lost
         print "client.py/Client.lostConnection"
-        self.network.join()
+        self.connection.join()
 
     def quit(self):
         # Quit connection
         print "client.py/Client.quit"
         if self.isConnected:
             self.isConnected = False
-            self.network.send("/quit" + self.get_data())  # TODO ?
-            self.network.join()
+            self.connection.send_to_server("/quit" + self.get_data())  # TODO ?
+            self.connection.join()
 
 
 if __name__ == "__main__":
@@ -122,7 +103,18 @@ if __name__ == "__main__":
         constants.host = sys.argv[1]
     else:
         constants.host = constants.DEFAULT_HOST
-    chat = Client()
-    chat.connect()
-    # while True:
-    #     chat.send()
+    client = Client()
+    # TODO
+    import sys
+    old_stdout = sys.stdout
+    # sys.stdout = open("clientout" + str(client.tempName) + ".txt", "w")
+    # - TODO -
+    client.connect()
+
+    time.sleep(0.2)
+    for i in range(50):
+        client.send()
+        time.sleep(1)
+
+    time.sleep(0.2)
+    sys.stdout = old_stdout
