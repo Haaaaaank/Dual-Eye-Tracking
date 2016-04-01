@@ -163,9 +163,9 @@ def handle_child(client_sock):
     dataQueue.writer(msg)
     while True:
         # check for and send any new messages
-        last_read = send_to_client(client_sock, last_read)
+        last_read = send_to_client(client_sock, last_read)  # TODO put in separate threads
         try:
-            data = client_sock.recv(constants.BUFFER_SIZE)
+            data = client_sock.recv(constants.BUFFER_SIZE)  # TODO put in separate threads
         except socket.timeout:
             continue
         except socket.error, (value, message):
@@ -176,7 +176,7 @@ def handle_child(client_sock):
         except:  # some error or connection reset by peer
             client_exit(client_sock, str(peer))
             break
-        if not len(data): # a disconnect (socket.close() by client)
+        if not len(data):  # a disconnect (socket.close() by client)
             client_exit(client_sock, str(peer))
             break
 
@@ -199,7 +199,7 @@ def handle_child(client_sock):
             dataQueue.writer(msg)
             break            # exit the loop to disconnect
 
-        else:  # received data
+        else:  # received actual data
             dataQueue.writer("Message from %s:\r\n\t%s\r\n" % (str(peer), data))
 
     client_sock.close()  # close the connection
@@ -231,7 +231,7 @@ if __name__ == '__main__':
             # set a timeout so it won't block forever on socket.recv().
             # Clients that are not doing anything check for new messages 
             # after each timeout.
-            client_sock.settimeout(1)
+            client_sock.settimeout(constants.SERVER_SOCKET_TIMEOUT)
         except KeyboardInterrupt:
             # shutdown - force the threads to close by closing their socket
             s.close()
