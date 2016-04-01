@@ -132,8 +132,11 @@ def send_to_client(sock, last_read):
     reading = dataQueue.reader(last_read)
     if reading is None:
         return last_read
-    for (last, timeStmp, msg) in reading:
-        sock.send("At %s -- %s" % (time.asctime(timeStmp), msg))
+    try:
+        for (last, timeStmp, msg) in reading:
+            sock.send("At %s -- %s" % (time.asctime(timeStmp), msg))
+    except:
+        print "Error"  # TODO add err msg
     return last
 
 

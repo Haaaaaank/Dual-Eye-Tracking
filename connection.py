@@ -71,5 +71,8 @@ class Connection(threading.Thread):
     def send_to_server(self, msg):
         print "networking.py/Connection.send"
         # Send a message to the server - called from and executes in the main thread
-        with self.socketLock:
-            self.socket.send(msg)
+        try:
+            with self.socketLock:
+                self.socket.send(msg)
+        except:
+            print "Error"  # TODO add err msg
