@@ -35,7 +35,7 @@ class Connection(threading.Thread):
         # The new thread starts here to listen for data from the server
         print "networking.py/Connection.run"
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.settimeout(constants.SOCKET_TIMEOUT)  # TODO Is there a better way than timeout?
+        self.socket.settimeout(constants.CLIENT_SOCKET_TIMEOUT)  # TODO Is there a better way than timeout?
 
         # Connect
         try:
