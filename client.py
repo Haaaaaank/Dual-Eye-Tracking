@@ -108,5 +108,9 @@ class Client(threading.Thread):
 
 
 if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        constants.host = sys.argv[1]
+    else:
+        constants.host = constants.DEFAULT_HOST
     client_thread = Client()
     client_thread.start()
