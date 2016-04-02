@@ -114,7 +114,7 @@ if __name__ == "__main__":
     time.sleep(0.2)
     for i in range(50):
         client.send()
-        time.sleep(1)
+        time.sleep(0.05)
 
     time.sleep(0.2)
     sys.stdout = old_stdout
