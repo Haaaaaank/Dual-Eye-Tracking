@@ -125,6 +125,37 @@ class MSGQueue(object):
         self.writerCounterLock.release()
 
 
+class DataHandler(threading.Thread):
+    # Store the data obtained from each client, and send them to all the other clients
+    def __init__(self):
+        threading.Thread.__init__(self)
+        # self.clients is a dict with ip address as the key
+        # and a tuple (socket, lock, data_list) as the value
+        self.clients = dict()
+
+    def add_client(self, newSock):
+        # if new_sock.getpeername() in self.clients:
+        #     raise RuntimeError("Client already exists.")
+        self.clients[newSock.getpeername()] = (newSock, [])
+
+    def write(self, clientIp, data):
+        # add data to storage
+        # this function is called and executed in another thread
+        # TODO check data here?
+        _, lock, data_list = self.clients[clientIp]
+        with lock:  # acquire the lock
+            data_list.append(data)
+
+    def run(self):
+        while True:
+            for ip in self.clients.keys():
+                sock, lock, data = self.clients[ip]  # TODO ()?
+                with lock:  # acquire the lock
+                    for datum in data:
+                        sock.send(datum)
+                    self.clients[ip][2] = []  # empty the data list
+
+
 def send_to_client(sock, last_read):
     print "server.py/MSGQueue.send_to_client"
     # this function just cuts down on some code duplication
@@ -151,24 +182,24 @@ def client_exit(sock, peer, error=None):
     dataQueue.writer(msg)
 
 
-def handle_child(client_sock):
-    print "server.py/MSGQueue.handle_child"
-    # Do the sending and receiving of data for one client
+def handle_client(clientSock):
+    print "server.py/MSGQueue.handle_client"
+    # a server thread that receives data from each client_sock
     global dataQueue
-    # last_reads of -1 gets all available messages on first read, even 
+    # last_reads of -1 gets all available messages on first read, even
     # if message index cycled back to zero.
     last_read = -1
     # the identity of each user is called peer - they are the peer on the other
-    # end of the socket connection. 
-    peer = client_sock.getpeername()
+    # end of the socket connection.
+    peer = clientSock.getpeername()
     print "Got connection from ", peer
     msg = str(peer) + " has joined\r\n"
     dataQueue.writer(msg)
     while True:
         # check for and send any new messages
-        last_read = send_to_client(client_sock, last_read)  # TODO put in separate threads
+        last_read = send_to_client(clientSock, last_read)  # TODO put in separate threads
         try:
-            data = client_sock.recv(constants.BUFFER_SIZE)  # TODO put in separate threads
+            data = clientSock.recv(constants.BUFFER_SIZE)  # TODO put in separate threads
         except socket.timeout:
             continue
         except socket.error, (value, message):
@@ -177,10 +208,10 @@ def handle_child(client_sock):
             print "Error: " + message
             return
         except:  # some error or connection reset by peer
-            client_exit(client_sock, str(peer))
+            client_exit(clientSock, str(peer))
             break
         if not len(data):  # a disconnect (socket.close() by client)
-            client_exit(client_sock, str(peer))
+            client_exit(clientSock, str(peer))
             break
 
         # Process the data received from the client
@@ -205,7 +236,7 @@ def handle_child(client_sock):
         else:  # received actual data
             dataQueue.writer("Message from %s:\r\n\t%s\r\n" % (str(peer), data))
 
-    client_sock.close()  # close the connection
+    clientSock.close()  # close the connection
 
 
 if __name__ == '__main__':
@@ -229,12 +260,12 @@ if __name__ == '__main__':
     while True:
         print "Waiting for Connections"
         try:
-            client_sock, client_addr = s.accept()
+            clientSock, clientAddr = s.accept()
             print "client accepted"
             # set a timeout so it won't block forever on socket.recv().
             # Clients that are not doing anything check for new messages 
             # after each timeout.
-            client_sock.settimeout(constants.SERVER_SOCKET_TIMEOUT)
+            clientSock.settimeout(constants.SERVER_SOCKET_TIMEOUT)
         except KeyboardInterrupt:
             # shutdown - force the threads to close by closing their socket
             s.close()
@@ -245,9 +276,9 @@ if __name__ == '__main__':
         #    traceback.print_exc()
         #    continue
 
-        clients.append(client_sock)
-        new_thread = threading.Thread(target=handle_child, args=[client_sock])
-        new_thread.setDaemon(True)
-        new_thread.start()
+        clients.append(clientSock)
+        clientHandler = threading.Thread(target=handle_client, args=[clientSock])
+        clientHandler.setDaemon(True)
+        clientHandler.start()
 
     sys.stdout = old_stdout
