@@ -98,13 +98,21 @@ class Client(threading.Thread):
             self.connection.join()
 
     def run(self):
+        # TODO
+        import sys
+        old_stdout = sys.stdout
+        # sys.stdout = open("clientout" + str(client.tempName) + ".txt", "w")
+        # - TODO -
+
         self.connect()
         time.sleep(0.2)
         for i in range(50):
             self.send()
-            time.sleep(1)
+            time.sleep(0.05)
 
         time.sleep(0.2)
+
+        sys.stdout = old_stdout
 
 
 if __name__ == "__main__":
