@@ -17,16 +17,18 @@ import sys
 import time
 import random
 import datetime
+import threading
 import constants
 from connection import Connection
 
 
-class Client(object):
+class Client(threading.Thread):
     """
     The main class containing the wxPython graphical interface.
     """
     def __init__(self):
         print "client.py/Client.__init__"
+        threading.Thread.__init__(self)
         self.isConnected = False
         self.connection = None
         self.tempCounter = 0
@@ -95,26 +97,28 @@ class Client(object):
             self.connection.send_to_server("/quit" + self.get_data())  # TODO ?
             self.connection.join()
 
+    def run(self):
+        # TODO
+        import sys
+        old_stdout = sys.stdout
+        # sys.stdout = open("clientout" + str(client.tempName) + ".txt", "w")
+        # - TODO -
+
+        self.connect()
+        time.sleep(0.2)
+        for i in range(50):
+            self.send()
+            time.sleep(0.05)
+
+        time.sleep(0.2)
+
+        sys.stdout = old_stdout
+
 
 if __name__ == "__main__":
-    print "client.py/__main__"
-    # set host name from command line arguments, if any
     if len(sys.argv) > 1:
         constants.host = sys.argv[1]
     else:
         constants.host = constants.DEFAULT_HOST
-    client = Client()
-    # TODO
-    import sys
-    old_stdout = sys.stdout
-    # sys.stdout = open("clientout" + str(client.tempName) + ".txt", "w")
-    # - TODO -
-    client.connect()
-
-    time.sleep(0.2)
-    for i in range(50):
-        client.send()
-        time.sleep(0.05)
-
-    time.sleep(0.2)
-    sys.stdout = old_stdout
+    client_thread = Client()
+    client_thread.start()
