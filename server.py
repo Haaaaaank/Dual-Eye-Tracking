@@ -7,9 +7,6 @@
 """
     Copyright 2016 Meng Du
 
-    Adopted from Tim Bower's Multi-threaded Chat Server
-    Original work Copyright 2009 Tim Bower
-
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
@@ -20,6 +17,7 @@ import socket
 import threading
 import logging
 import constants
+import commands
 
 
 class DataHandler(threading.Thread):
@@ -80,7 +78,7 @@ class DataHandler(threading.Thread):
 
 def handle_client(client_sock):
     global dataHandler
-    print "server.py/MSGQueue.handle_client"
+    print "server.py/handle_client"
     # a server thread that receives data from each client_sock
     peer_name = client_sock.getpeername()
     print "Got connection from ", peer_name
@@ -107,6 +105,21 @@ def handle_client(client_sock):
 
         # Process the data received from the client
         # Check if it is a command
+        is_command = False
+        client_stays = True
+        for command in commands.commands:
+            if data.startswith(command):
+                client_stays = commands.commands[command](dataHandler, peer_name)
+                is_command = True
+                break
+
+        if not client_stays:  # client exits, end the thread
+            break
+
+        if not is_command:  # received actual data
+            dataHandler.write_data(peer_name, "Message from %s:\r\n\t%s\r\n" % (str(peer_name), data))
+
+        """
         if data.startswith('/name'):
             # TODO
             old_name = peer_name
@@ -128,6 +141,7 @@ def handle_client(client_sock):
 
         else:  # received actual data
             dataHandler.write_data(peer_name, "Message from %s:\r\n\t%s\r\n" % (str(peer_name), data))
+        """
 
 
 if __name__ == '__main__':

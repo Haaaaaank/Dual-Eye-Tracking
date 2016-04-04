@@ -19,6 +19,8 @@ import random
 import datetime
 import threading
 import constants
+import commands
+import utilities
 from connection import Connection
 
 
@@ -39,10 +41,11 @@ class Client(threading.Thread):
         print "client.py/Client.get_data"
         data = str(self.tempName) + ": " + str(self.tempCounter)
         self.tempCounter += 1
+        # data = utilities.get_data()
         if len(data):
             return data
         else:
-            return ''
+            return None
 
     def connect(self):
         # Connect to server
@@ -54,16 +57,16 @@ class Client(threading.Thread):
     def disconnect(self):
         # Disconnect from server
         name = self.get_data()  # TODO whut
-        self.connection.send_to_server("/quit " + name)
+        self.connection.send_to_server(constants.CMD_QUIT + name)
 
     def send(self):
         # Send the data to server. Data is obtained by get_data().
         print "client.py/Client.send"
         if self.isConnected:
-            sendData = self.get_data()
-            print "client_send: ", sendData
-            if len(sendData):
-                self.connection.send_to_server(sendData)
+            data = self.get_data()
+            print "client_send: ", data
+            if data is not None:
+                self.connection.send_to_server(data)
 
     def set_name(self):
         print "client.py/Client.set_name"
@@ -71,7 +74,7 @@ class Client(threading.Thread):
         if self.isConnected:
             name = self.get_data()  # TODO change this, name does not come from get_data()
             if len(name):
-                self.connection.send_to_server("/name " + name)
+                self.connection.send_to_server(constants.CMD_RENAME + name)
 
     def connected(self):
         # This function is invoked in networking.Connection.run()
@@ -81,8 +84,7 @@ class Client(threading.Thread):
     def display(self, data):  # TODO DISPLAY EYE POSITION
         print "client.py/Client.display"
         # Display the eye positions
-        print datetime.datetime.now()
-        print data
+        utilities.display(data)
 
     def lost_connection(self, msg):  # TODO
         # This function is invoked in networking.Connection.run() when connection is lost
@@ -94,14 +96,14 @@ class Client(threading.Thread):
         print "client.py/Client.quit"
         if self.isConnected:
             self.isConnected = False
-            self.connection.send_to_server("/quit" + self.get_data())  # TODO ?
+            self.connection.send_to_server(constants.CMD_QUIT + self.get_data())  # TODO ?
             self.connection.join()
 
     def run(self):
         # TODO
         import sys
         old_stdout = sys.stdout
-        # sys.stdout = open("clientout" + str(client.tempName) + ".txt", "w")
+        sys.stdout = open("clientout" + str(self.tempName) + ".txt", "w")
         # - TODO -
 
         self.connect()
@@ -118,7 +120,5 @@ class Client(threading.Thread):
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         constants.host = sys.argv[1]
-    else:
-        constants.host = constants.DEFAULT_HOST
     client_thread = Client()
     client_thread.start()

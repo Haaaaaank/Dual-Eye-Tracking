@@ -1,5 +1,5 @@
 """
-    The Connection class handles all the socket networking stuff
+    The Connection class handles all the socket networking stuff of a client
 """
 """
     Copyright 2016 Meng Du
