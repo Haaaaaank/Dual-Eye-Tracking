@@ -10,12 +10,18 @@
         http://www.apache.org/licenses/LICENSE-2.0
 """
 
+from pygaze.libscreen import Display
+from pygaze.eyetracker import EyeTracker
+
+disp = Display()
+tracker = EyeTracker(disp)
+
 
 def get_data():
-    return ''
+    data = tracker.sample()
+    return str(data)
 
 
 def display(data):
     import datetime
-    print datetime.datetime.now()
-    print data
+    print datetime.datetime.now(), data

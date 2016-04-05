@@ -12,7 +12,7 @@
         http://www.apache.org/licenses/LICENSE-2.0
 """
 
-import constants
+import net_constants
 
 
 def client_quit(data_handler, peer_name):
@@ -30,4 +30,4 @@ def rename(data_handler, peer_name):
     return False
 
 
-commands = {constants.CMD_RENAME: rename, constants.CMD_QUIT: client_quit, constants.CMD_START: start}
+commands = {net_constants.CMD_RENAME: rename, net_constants.CMD_QUIT: client_quit, net_constants.CMD_START: start}

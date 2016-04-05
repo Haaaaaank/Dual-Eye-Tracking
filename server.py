@@ -16,7 +16,7 @@
 import socket
 import threading
 import logging
-import constants
+import net_constants
 import commands
 
 
@@ -88,7 +88,7 @@ def handle_client(client_sock):
     while True:
         # check for and send any new messages
         try:
-            data = client_sock.recv(constants.BUFFER_SIZE)  # TODO recvall?
+            data = client_sock.recv(net_constants.BUFFER_SIZE)  # TODO recvall?
         except socket.timeout:
             continue
         except socket.error, (value, message):
@@ -117,7 +117,7 @@ def handle_client(client_sock):
             break
 
         if not is_command:  # received actual data
-            dataHandler.write_data(peer_name, "Message from %s:\r\n\t%s\r\n" % (str(peer_name), data))
+            dataHandler.write_data(peer_name, data)  # TODO add info about sender of data
 
         """
         if data.startswith('/name'):
@@ -147,17 +147,11 @@ def handle_client(client_sock):
 if __name__ == '__main__':
     print "server.py/__main__"
 
-    # TODO
-    import sys
-    old_stdout = sys.stdout
-    # sys.stdout = open("serverout.txt", "w")
-    # - TODO -
-
     # Set up the socket.
     connection_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     connection_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    connection_sock.bind((constants.host, constants.PORT))
-    connection_sock.listen(constants.SOCKET_BACKLOG)
+    connection_sock.bind((net_constants.host, net_constants.PORT))
+    connection_sock.listen(net_constants.SOCKET_BACKLOG)
 
     dataHandler = DataHandler()  # global
     dataHandler.start()
@@ -170,7 +164,7 @@ if __name__ == '__main__':
             # set a timeout so it won't block forever on socket.recv().
             # Clients that are not doing anything check for new messages 
             # after each timeout.
-            clientSock.settimeout(constants.SERVER_SOCKET_TIMEOUT)
+            clientSock.settimeout(net_constants.SERVER_SOCKET_TIMEOUT)
         except KeyboardInterrupt:
             # shutdown - force the threads to close by closing their socket
             connection_sock.close()
@@ -184,5 +178,3 @@ if __name__ == '__main__':
         clientHandler = threading.Thread(target=handle_client, args=(clientSock,))
         clientHandler.setDaemon(True)
         clientHandler.start()
-
-    sys.stdout = old_stdout
