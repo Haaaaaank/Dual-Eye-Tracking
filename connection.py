@@ -35,14 +35,16 @@ class Connection(threading.Thread):
         # The new thread starts here to listen for data from the server
         print "networking.py/Connection.run"
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.settimeout(net_constants.CLIENT_SOCKET_TIMEOUT)  # TODO Is there a better way than timeout?
 
         # Connect
         try:
             self.socket.connect((self.host, net_constants.PORT))
         except Exception as e:
-            self.lost("Unable to connect to the server. Error: " + e)
+            print "Unable to connect to the server. Error: " + str(e)
+            self.lost("")
             return
+
+        self.socket.settimeout(net_constants.CLIENT_SOCKET_TIMEOUT)  # TODO Is there a better way than timeout?
         self.connected()
 
         # Receive data
@@ -55,7 +57,8 @@ class Connection(threading.Thread):
                 # print "timeout"
                 continue
             except Exception as e:  # server was stopped or had some error
-                self.lost("Network Connection closed by the server. " + e)
+                print "Network Connection closed by the server. " + str(e)
+                self.lost("")
                 break
 
             if len(data):

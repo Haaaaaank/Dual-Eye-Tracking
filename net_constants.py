@@ -1,4 +1,4 @@
-BUFFER_SIZE = 128    # TODO should be multiply of the size of eye position; use previous send_all()?
+BUFFER_SIZE = 64    # TODO should be multiply of the size of eye position; use previous send_all()?
 
 DEFAULT_HOST = 'localhost'
 host = '67.194.3.142'

@@ -34,15 +34,19 @@ class Client(threading.Thread):
         self.connection = None
         # self.tempCounter = 0
         self.tempName = random.randint(1, 100)
+        self.current_data = None
 
     def get_data(self):
-        # TODO Return the eye position
         # print "client.py/Client.get_data"
         # data = str(self.tempName) + ": " + str(self.tempCounter)
         # self.tempCounter += 1
         data = utilities.get_data()
         if len(data):
-            return data
+            if data is not self.current_data:
+                self.current_data = data
+                return data
+            else:  # ignore duplicates
+                return None
         else:
             return None
 
@@ -109,6 +113,7 @@ class Client(threading.Thread):
         time.sleep(0.05)
         while True:
             self.send()
+            time.sleep(0.001)
 
         sys.stdout = old_stdout
 

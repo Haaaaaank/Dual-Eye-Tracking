@@ -25,15 +25,16 @@ logging.basicConfig(filename='dataLog.log', level=logging.DEBUG)
 
 def get_data():
     # data = tracker.sample()
-    return ''  # str(data)
+    # check whether the data has changed
+    return 'test'  # str(data)
 
 
 def display(data):
     # assume data is a string containing tuple (x, y)
-    if len(data) < 21:
+    try:
         pos_tuple = literal_eval(data)
         logging.info(pos_tuple)
-    else:
+    except (ValueError, SyntaxError):
         print data
     # import datetime
     # print datetime.datetime.now(), data
