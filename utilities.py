@@ -10,6 +10,7 @@
         http://www.apache.org/licenses/LICENSE-2.0
 """
 
+from ast import literal_eval
 from pygaze.libscreen import Display
 from pygaze.eyetracker import EyeTracker
 
@@ -23,5 +24,7 @@ def get_data():
 
 
 def display(data):
-    import datetime
-    print datetime.datetime.now(), data
+    # assume data is a string containing tuple (x, y)
+    tuple = literal_eval(data)
+    # import datetime
+    # print datetime.datetime.now(), data
