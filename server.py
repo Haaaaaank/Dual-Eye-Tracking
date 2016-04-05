@@ -36,9 +36,9 @@ class DataHandler(threading.Thread):
         
     def disconnect_client(self, name, error=None):
         if error:
-            msg = name + " has exited -- " + error + "\r\n"
+            msg = str(name) + " has exited -- " + error + "\r\n"
         else:
-            msg = name + " has exited\r\n"
+            msg = str(name) + " has exited\r\n"
         # dataQueue.writer(msg)
         self.write_data(name, msg)
         # close the connection

@@ -11,20 +11,29 @@
 """
 
 from ast import literal_eval
-from pygaze.libscreen import Display
-from pygaze.eyetracker import EyeTracker
+import logging
 
-disp = Display()
-tracker = EyeTracker(disp)
+# from pygaze.libscreen import Display, Screen
+# from pygaze.eyetracker import EyeTracker
+
+# disp = Display()
+# tracker = EyeTracker(disp)
+# scr = Screen
+
+logging.basicConfig(filename='dataLog.log', level=logging.DEBUG)
 
 
 def get_data():
-    data = tracker.sample()
-    return str(data)
+    # data = tracker.sample()
+    return ''  # str(data)
 
 
 def display(data):
     # assume data is a string containing tuple (x, y)
-    tuple = literal_eval(data)
+    if len(data) < 21:
+        pos_tuple = literal_eval(data)
+        logging.info(pos_tuple)
+    else:
+        print data
     # import datetime
     # print datetime.datetime.now(), data

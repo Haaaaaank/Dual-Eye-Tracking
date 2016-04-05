@@ -1,7 +1,7 @@
 BUFFER_SIZE = 128    # TODO should be multiply of the size of eye position; use previous send_all()?
 
 DEFAULT_HOST = 'localhost'
-host = DEFAULT_HOST
+host = '67.194.5.236'
 PORT = 50000
 SOCKET_BACKLOG = 5
 CLIENT_SOCKET_TIMEOUT = 0.05  # TODO probably should be higher if the internet connection is slow?

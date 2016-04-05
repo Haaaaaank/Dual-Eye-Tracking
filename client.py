@@ -63,8 +63,8 @@ class Client(threading.Thread):
         print "client.py/Client.send"
         if self.isConnected:
             data = self.get_data()
-            print "client_send: ", data
             if data is not None:
+                print "client_send: ", data
                 self.connection.send_to_server(data)
 
     def set_name(self):
