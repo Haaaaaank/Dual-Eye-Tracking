@@ -37,7 +37,7 @@ class Client(threading.Thread):
 
     def get_data(self):
         # TODO Return the eye position
-        print "client.py/Client.get_data"
+        # print "client.py/Client.get_data"
         # data = str(self.tempName) + ": " + str(self.tempCounter)
         # self.tempCounter += 1
         data = utilities.get_data()
@@ -60,7 +60,7 @@ class Client(threading.Thread):
 
     def send(self):
         # Send the data to server. Data is obtained by get_data().
-        print "client.py/Client.send"
+        # print "client.py/Client.send"
         if self.isConnected:
             data = self.get_data()
             if data is not None:

@@ -40,8 +40,8 @@ class Connection(threading.Thread):
         # Connect
         try:
             self.socket.connect((self.host, net_constants.PORT))
-        except:
-            self.lost("Unable to connect to %s. Please check the server." % self.host)
+        except Exception as e:
+            self.lost("Unable to connect to the server. Error: " + e)
             return
         self.connected()
 
@@ -54,8 +54,8 @@ class Connection(threading.Thread):
             except socket.timeout:
                 # print "timeout"
                 continue
-            except:  # server was stopped or had some error
-                self.lost("Network Connection closed by the server.")
+            except Exception as e:  # server was stopped or had some error
+                self.lost("Network Connection closed by the server. " + e)
                 break
 
             if len(data):
@@ -74,5 +74,5 @@ class Connection(threading.Thread):
         try:
             with self.socketLock:
                 self.socket.send(msg)
-        except:
-            print "Error"  # TODO add err msg
+        except Exception as e:
+            print "Error:", e
