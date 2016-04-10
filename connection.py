@@ -1,5 +1,5 @@
 """
-    The Connection class handles all the socket networking stuff of a client
+    The Connection class handles all the socket networking functions of a client
 """
 """
     Copyright 2016 Meng Du
@@ -73,7 +73,8 @@ class Connection(threading.Thread):
 
     def send_to_server(self, msg):
         print "networking.py/Connection.send"
-        # Send a message to the server - called from and executes in the main thread
+        # Send a message to the server
+        # This is called from and executes in the client main thread
         try:
             with self.socketLock:
                 self.socket.send(msg)
