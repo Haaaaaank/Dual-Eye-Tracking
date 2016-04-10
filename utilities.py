@@ -24,8 +24,9 @@ logging.basicConfig(filename='dataLog.log', level=logging.DEBUG)
 
 
 def get_data():
-    # data = tracker.sample()
+    # This function should return a string
     # TODO
+    # data = tracker.sample()
     return 'test'  # str(data)
 
 
