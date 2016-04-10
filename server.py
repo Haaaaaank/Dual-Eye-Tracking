@@ -21,7 +21,8 @@ import commands
 
 
 class DataHandler(threading.Thread):
-    # Store the data obtained from each client, and send them to all the other clients
+    # A DataHandler maintains the data obtained from each client as a shared resource
+    # and continuously checks and sends the new data to all the other clients
     def __init__(self):
         threading.Thread.__init__(self)
         # self.clients is a dict with peer name as the key
@@ -60,6 +61,7 @@ class DataHandler(threading.Thread):
             data_list.append(data)
 
     def run(self):
+        # send data continuously
         print "server.py/DataHandler.run"
         while True:
             for name in self.clients.keys():
@@ -77,9 +79,9 @@ class DataHandler(threading.Thread):
 
 
 def handle_client(client_sock):
+    # a server thread that receives data from each client_sock
     global dataHandler
     print "server.py/handle_client"
-    # a server thread that receives data from each client_sock
     peer_name = client_sock.getpeername()
     print "Got connection from ", peer_name
     msg = str(peer_name) + " has joined\r\n"
@@ -109,6 +111,7 @@ def handle_client(client_sock):
         client_stays = True
         for command in commands.commands:
             if data.startswith(command):
+                # calling the corresponding command function
                 client_stays = commands.commands[command](dataHandler, peer_name)
                 is_command = True
                 break
@@ -153,6 +156,7 @@ if __name__ == '__main__':
     connection_sock.bind((net_constants.host, net_constants.PORT))
     connection_sock.listen(net_constants.SOCKET_BACKLOG)
 
+    # Start the dataHandler
     dataHandler = DataHandler()  # global
     dataHandler.start()
 
@@ -175,6 +179,7 @@ if __name__ == '__main__':
         #    continue
 
         dataHandler.add_client(clientSock)
+        # start a handle_client thread for each client
         clientHandler = threading.Thread(target=handle_client, args=(clientSock,))
         clientHandler.setDaemon(True)
         clientHandler.start()
