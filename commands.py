@@ -23,10 +23,12 @@ def client_quit(data_handler, peer_name):
 
 
 def start(data_handler, peer_name):
+    # TODO
     return False
 
 
 def rename(data_handler, peer_name):
+    # TODO
     return False
 
 
