@@ -3,6 +3,7 @@
 """
     A client represents a user with an eye tracker. It sends its eye tracking data
     to the server, and receives data of all the other clients from the server.
+    Each Client has a Connection that maintains the networking to the server.
 """
 """
     Copyright 2016 Meng Du
@@ -33,7 +34,7 @@ class Client(threading.Thread):
         self.isConnected = False
         self.connection = None
         # self.tempCounter = 0
-        self.tempName = random.randint(1, 100)
+        self.tempName = random.randint(1, 100)  # TODO
         self.current_data = None
 
     def get_data(self):
@@ -104,20 +105,22 @@ class Client(threading.Thread):
 
     def run(self):
         # TODO
-        import sys
-        old_stdout = sys.stdout
-        sys.stdout = open("clientout" + str(self.tempName) + ".txt", "w")
+        # import sys
+        # old_stdout = sys.stdout
+        # sys.stdout = open("clientout" + str(self.tempName) + ".txt", "w")
         # - TODO -
 
         self.connect()
         time.sleep(0.05)
         while True:
             self.send()
-            time.sleep(0.001)
+            time.sleep(0.001)  # for test purpose TODO
 
-        sys.stdout = old_stdout
+        # sys.stdout = old_stdout
 
 
+# if running this script from an experiment, delete the next line and insert the stuff below that into
+# the place where dual-eye-tracking should start.
 if __name__ == "__main__":
     # if len(sys.argv) > 1:
     #     net_constants.host = sys.argv[1]
