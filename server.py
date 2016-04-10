@@ -30,7 +30,7 @@ class DataHandler(threading.Thread):
         self.clients = dict()
 
     def add_client(self, new_sock):
-        # called and executed in the main thread
+        # called and executed in the server main thread
         # if new_sock.getpeername() in self.clients:
         #     raise RuntimeError("Client already exists.")
         self.clients[new_sock.getpeername()] = (new_sock, threading.Lock(), [])
@@ -40,7 +40,6 @@ class DataHandler(threading.Thread):
             msg = str(name) + " has exited -- " + error + "\r\n"
         else:
             msg = str(name) + " has exited\r\n"
-        # dataQueue.writer(msg)
         self.write_data(name, msg)
         # close the connection
         sock = self.clients[name][0]
@@ -54,7 +53,7 @@ class DataHandler(threading.Thread):
 
     def write_data(self, peer_name, data):
         # add data to storage
-        # this function is called and executed in the main thread
+        # this function is called and executed in the handle_client thread
         # TODO check data here?
         _, lock, data_list = self.clients[peer_name]
         with lock:  # acquire the lock
