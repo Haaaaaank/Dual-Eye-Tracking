@@ -25,12 +25,12 @@ logging.basicConfig(filename='dataLog.log', level=logging.DEBUG)
 
 def get_data():
     # data = tracker.sample()
-    # check whether the data has changed
+    # TODO
     return 'test'  # str(data)
 
 
 def display(data):
-    # assume data is a string containing tuple (x, y)
+    # assuming data is a string containing tuple (x, y)
     try:
         pos_tuple = literal_eval(data)
         logging.info(pos_tuple)
