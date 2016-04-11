@@ -1,8 +1,8 @@
 # Dual-Eye-Tracking
-This program shares real-time data among computers with TCP sockets
+This multi-threaded program shares real-time data among computers with TCP sockets
 
 ### Usage
-* Set up one or more computers that share data with each other. One computer needs to be the server.
+* Set up one or more computers that share data with each other. One computer needs to be the server (it can be the server and a client at the same time).
 * Change `host` in `net_constants.py` to the ip address of the server.
 * Change the `get_data()` and `display(data)` functions in `utilities.py` to reflect how the data are obtained and how they are displayed on the other clients' screen.
 * If necessary, integrate the client as a part of the experiment program:
